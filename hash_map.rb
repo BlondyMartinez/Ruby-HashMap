@@ -17,24 +17,37 @@ class HashMap
 
     def set(key, value)  
         index = get_index(key)
+
+        # Ensure that the @buckets array has enough capacity
+        if @buckets[index].nil?
+            @buckets[index] = []
+        end
+    
         current = @buckets[index]
     
-        if current.nil?
-            @buckets[index] = [[key, value]]
-            @length += 1
-        elsif !has(key)
-            current << [key, value]
+        if has(key)
+            current.each do |pair|
+                if pair[0] == key
+                    pair[1] = value  
+                    return [key, value] 
+                end
+            end
+        else
+            current << [key, value] 
             @length += 1
         end
+    
+        [key, value]
     end
 
     def get(key)
         current = @buckets[get_index(key)]
-    
         return nil if current.nil?
     
         current.each do |pair|
             return pair[1] if pair[0] == key
+
+            puts "Checking pair: #{pair.inspect}"
         end
     
         return nil
@@ -106,5 +119,6 @@ class HashMap
     def get_index(key)
         index = hash(key) % @buckets.length
         raise IndexError if index.negative? || index >= @buckets.length
+        index
     end
 end
